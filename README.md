@@ -1,7 +1,7 @@
 # 🧠 DocuMind
 
 > **Local-First RAG (Retrieval-Augmented Generation) & Document Knowledge Base**  
-> Tanya-jawab cerdas dengan dokumen PDF, Markdown, dan TXT dengan sitasi sumber akurat dan pencegahan halusinasi.
+> Smart document question-answering over PDF, Markdown, and TXT files with precise source citations, anti-hallucination guardrails, and real-time streaming LLM responses.
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg?logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.42+-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io)
@@ -12,18 +12,18 @@
 
 ---
 
-## 🌟 Fitur Utama
+## 🌟 Key Features
 
-- 📄 **Multi-Format Ingestion**: Mendukung upload berkas `.pdf`, `.md`, dan `.txt` secara bersamaan.
-- ✂️ **Recursive Smart Chunking**: Pemisahan teks berbasis paragraf, kalimat, dan karakter dengan overlap dinamis untuk menjaga keutuhan konteks informasi.
-- 🎯 **Persistent Vector Store**: Menggunakan **ChromaDB** lokal untuk pencarian semantik berkecepatan tinggi tanpa dependensi cloud vector database eksternal yang rumit.
-- 📚 **Grounded Citations**: Setiap jawaban AI dilengkapi dengan referensi nomor halaman, nama berkas sumber, dan persentase relevansi kesesuaian (*anti-hallucination*).
-- ⚡ **Real-Time Streaming**: Tampilan jawaban *typewriter-style* responsif menggunakan streaming LLM API.
-- 🧪 **Test-Driven & Production Ready**: Dilengkapi rangkaian unit test (`pytest`), arsitektur modular, dan containerization (`Dockerfile` & `docker-compose.yml`).
+- 📄 **Multi-Format Ingestion**: Seamlessly ingest `.pdf`, `.md`, and `.txt` documents simultaneously.
+- ✂️ **Recursive Smart Chunking**: Context-aware splitting across paragraphs, sentences, and words with dynamic character overlap to preserve semantic context.
+- 🎯 **Persistent Local Vector Store**: Powered by **ChromaDB** for ultra-fast local semantic retrieval without complex external database dependencies.
+- 📚 **Grounded Citations**: Every generated answer is paired with page numbers, source filenames, and relevancy similarity scores to prevent AI hallucinations.
+- ⚡ **Real-Time Streaming**: Responsive typewriter-style streaming responses powered by Google Gemini.
+- 🧪 **Production-Grade & Tested**: Modular architecture with automated unit tests (`pytest`), containerization (`Dockerfile` & `docker-compose.yml`), and modern packaging via `uv`.
 
 ---
 
-## 🏛️ Arsitektur Sistem
+## 🏛️ System Architecture
 
 ```mermaid
 flowchart TD
@@ -35,7 +35,7 @@ flowchart TD
     end
 
     subgraph RAG ["2. Semantic Retrieval & Generation"]
-        Q[Pertanyaan Pengguna] --> F[Query Embedder]
+        Q[User Question] --> F[Query Embedder]
         F -->|Search Vector| E
         E -->|Top-K Relevant Chunks & Citations| G[Grounded Context Builder]
         G --> H[Google Gemini LLM Engine]
@@ -47,92 +47,92 @@ flowchart TD
 
 ## 🛠️ Tech Stack
 
-| Komponen | Teknologi | Keterangan |
+| Component | Technology | Description |
 |---|---|---|
-| **Language** | Python 3.12 | Menggunakan packaging modern via `uv` |
-| **Frontend / UI** | Streamlit | Responsive dashboard & chat interface |
-| **Vector Database** | ChromaDB | Local embedded vector store (Cosine similarity) |
-| **LLM Provider** | Google Gemini (`gemini-2.5-flash`) | Fast, low latency, dan reasoning cerdas |
-| **Embedding Engine** | `text-embedding-004` / Fast ONNX | Dukungan API atau local offline fallback |
-| **PDF Extraction** | `pypdf` | Ringan, murni Python, tanpa dependensi sistem C++ berat |
-| **Testing** | `pytest` | Pengujian unit untuk loader, chunker, & vector store |
-| **Container** | Docker & Docker Compose | Siap dijalankan di mana saja |
+| **Language** | Python 3.12 | Managed using modern, blazing-fast `uv` packaging |
+| **Frontend / UI** | Streamlit | Clean, responsive web dashboard & chat interface |
+| **Vector Database** | ChromaDB | Embedded local vector store with Cosine similarity |
+| **LLM Provider** | Google Gemini (`gemini-2.5-flash`) | Low latency, high reasoning quality, and streaming support |
+| **Embedding Engine** | `text-embedding-004` / Fast ONNX | Gemini embedding model with automatic local fallback |
+| **PDF Extraction** | `pypdf` | Lightweight, pure Python extraction without heavy C++ dependencies |
+| **Testing** | `pytest` | Unit tests covering document loaders, chunkers, and vector store operations |
+| **Containerization** | Docker & Docker Compose | Single-command deployment anywhere |
 
 ---
 
-## 🚀 Memulai (Quickstart)
+## 🚀 Getting Started
 
-### 1. Prasyarat
-- Python 3.12+ terinstal, ATAU gunakan [uv](https://astral.sh/uv) (direkomendasikan).
-- Kunci API Google Gemini (dapat diperoleh secara gratis di [Google AI Studio](https://aistudio.google.com/)).
+### 1. Prerequisites
+- Python 3.12+ installed, OR [uv](https://astral.sh/uv) (recommended).
+- A Google Gemini API Key (free tier available at [Google AI Studio](https://aistudio.google.com/)).
 
-### 2. Clone Repositori
+### 2. Clone the Repository
 ```bash
-git clone https://github.com/username/documind.git
+git clone https://github.com/Jansky0/documind.git
 cd documind
 ```
 
-### 3. Setup Lingkungan & Dependensi
+### 3. Setup Environment & Dependencies
 
-#### Opsi A: Menggunakan `uv` (Sangat Cepat & Praktis)
+#### Option A: Using `uv` (Recommended — Fast & Clean)
 ```bash
-# Sinkronkan dan instal dependensi
+# Sync and install all dependencies in a virtual environment
 uv sync
 
-# Salin konfigurasi environment
+# Copy environment configuration template
 cp .env.example .env
 ```
 
-#### Opsi B: Menggunakan Standard `venv` & `pip`
+#### Option B: Using Standard `venv` & `pip`
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r <(uv pip compile pyproject.toml) # atau pip install streamlit google-genai chromadb pypdf python-dotenv pytest
+pip install -r requirements.txt
 cp .env.example .env
 ```
 
-### 4. Konfigurasi API Key
-Buka berkas `.env` dan masukkan API Key Gemini Anda:
+### 4. Configure Your API Key
+Open `.env` and add your Google Gemini API Key:
 ```env
 GEMINI_API_KEY=AIzaSy...
 GEMINI_MODEL=gemini-2.5-flash
 ```
-*(Catatan: Anda juga bisa memasukkan API Key langsung melalui antarmuka web di sidebar).*
+*(Note: You can also input or change your API Key directly within the Streamlit sidebar UI).*
 
-### 5. Jalankan Aplikasi
+### 5. Launch the Application
 ```bash
-# Menjalankan dengan uv
+# Running with uv
 uv run streamlit run app.py
 
-# Atau jika venv aktif
+# Or if virtualenv is activated
 streamlit run app.py
 ```
-Akses aplikasi melalui browser di: `http://localhost:8501`
+Open your browser and navigate to: `http://localhost:8501`
 
 ---
 
-## 🐳 Menjalankan dengan Docker
+## 🐳 Running with Docker
 
-Jika Anda memiliki Docker terpasang:
+Run DocuMind in an isolated container with Docker Compose:
 ```bash
-# Buat file .env terlebih dahulu
+# Setup environment file
 cp .env.example .env
 
-# Jalankan dengan docker compose
+# Build and start container
 docker compose up --build
 ```
-Buka browser di `http://localhost:8501`.
+Access the application at `http://localhost:8501`.
 
 ---
 
-## 🧪 Menjalankan Pengujian (Testing)
+## 🧪 Running Unit Tests
 
-Projek ini dilengkapi unit testing untuk memvalidasi algoritma chunking dan operasi vector store:
+DocuMind includes a complete unit test suite validating text parsing, chunking boundary logic, and vector store operations:
 ```bash
 uv run pytest -v
 ```
 
-Hasil test:
+Expected output:
 ```text
 tests/test_rag.py::test_recursive_split_text PASSED
 tests/test_rag.py::test_load_and_chunk_document PASSED
@@ -141,33 +141,33 @@ tests/test_rag.py::test_vector_store_crud PASSED
 
 ---
 
-## 📁 Struktur Projek
+## 📁 Project Structure
 
 ```text
 documind/
-├── .env.example              # Template variabel lingkungan
-├── .gitignore                # File exclusion list
-├── Dockerfile                # Konfigurasi container Docker
-├── docker-compose.yml        # Orchestration multi-service
-├── pyproject.toml            # Definisi dependensi & metadata projek
-├── README.md                 # Dokumentasi projek
-├── app.py                    # Entry point UI Streamlit
+├── .env.example              # Environment variables template
+├── .gitignore                # Git ignore rules
+├── Dockerfile                # Production Docker container definition
+├── docker-compose.yml        # Docker service orchestration
+├── pyproject.toml            # Project dependencies & metadata
+├── README.md                 # Project documentation
+├── app.py                    # Streamlit web UI entrypoint
 ├── data/
-│   ├── chroma_db/            # Direktori penyimpanan indeks vektor lokal
-│   ├── sample_documents/     # Contoh berkas untuk uji coba
-│   └── uploads/              # Penyimpanan sementara berkas yang diunggah
+│   ├── chroma_db/            # Local ChromaDB persistent vector data
+│   ├── sample_documents/     # Sample documents for quick testing
+│   └── uploads/              # Uploaded document staging folder
 ├── src/
 │   ├── __init__.py
-│   ├── config.py             # Konfigurasi global dan path management
-│   ├── document_loader.py    # Logika ekstraksi teks dan recursive chunking
-│   ├── rag_engine.py         # Pipeline query, prompt grounding, & Gemini streaming
-│   └── vector_store.py       # Wrapper ChromaDB dengan custom embedding
+│   ├── config.py             # Global configuration & path management
+│   ├── document_loader.py    # Multi-format document parsing & recursive chunking
+│   ├── rag_engine.py         # Grounded prompt construction & Gemini streaming
+│   └── vector_store.py       # ChromaDB wrapper with embedding support
 └── tests/
     ├── __init__.py
-    └── test_rag.py           # Unit tests
+    └── test_rag.py           # Pytest test cases
 ```
 
 ---
 
-## 📄 Lisensi
-Projek ini didistribusikan di bawah lisensi [MIT](LICENSE).
+## 📄 License
+This project is open-source and distributed under the [MIT License](LICENSE).

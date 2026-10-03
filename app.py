@@ -88,12 +88,12 @@ with st.sidebar:
     st.divider()
 
     # API Key Configuration
-    st.subheader("🔑 Konfigurasi AI")
+    st.subheader("🔑 AI Configuration")
     user_api_key = st.text_input(
         "Google Gemini API Key",
         value=st.session_state.api_key,
         type="password",
-        help="Dapatkan kunci API gratis di https://aistudio.google.com/",
+        help="Get a free API key at https://aistudio.google.com/",
     )
     if user_api_key != st.session_state.api_key:
         st.session_state.api_key = user_api_key
@@ -112,7 +112,7 @@ with st.sidebar:
         else model_options[0]
     )
     selected_model = st.selectbox(
-        "Model LLM",
+        "LLM Model",
         options=model_options,
         index=model_options.index(current_model),
     )
@@ -120,26 +120,26 @@ with st.sidebar:
         st.session_state.selected_model = selected_model
         st.rerun()
 
-    top_k_val = st.slider("Top Chunks Diambil (Top-K)", min_value=1, max_value=8, value=4)
+    top_k_val = st.slider("Top Chunks Retrieved (Top-K)", min_value=1, max_value=8, value=4)
 
     st.divider()
 
     # Document Upload Section
-    st.subheader("📤 Unggah Dokumen")
+    st.subheader("📤 Upload Documents")
     uploaded_files = st.file_uploader(
-        "Pilih file PDF, Markdown, atau TXT",
+        "Select PDF, Markdown, or TXT files",
         type=["pdf", "md", "txt"],
         accept_multiple_files=True,
     )
 
     if uploaded_files:
-        if st.button("⚡ Proses & Indeks Dokumen", use_container_width=True):
+        if st.button("⚡ Process & Index Documents", use_container_width=True):
             progress_bar = st.progress(0)
             status_text = st.empty()
 
             total_files = len(uploaded_files)
             for idx, uploaded_file in enumerate(uploaded_files):
-                status_text.text(f"Memproses {uploaded_file.name}...")
+                status_text.text(f"Processing {uploaded_file.name}...")
                 save_path = UPLOADS_DIR / uploaded_file.name
 
                 with open(save_path, "wb") as f:
@@ -158,34 +158,34 @@ with st.sidebar:
 
             status_text.empty()
             progress_bar.empty()
-            st.success(f"Berhasil mengindeks {total_files} file ke Vector Store!")
+            st.success(f"Successfully indexed {total_files} file(s) into Vector Store!")
             time.sleep(1)
             st.rerun()
 
     st.divider()
 
     # Indexed Documents List
-    st.subheader("📚 Dokumen Terindeks")
+    st.subheader("📚 Indexed Documents")
     indexed_sources = vector_store.list_sources()
 
     if not indexed_sources:
-        st.info("Belum ada dokumen yang diindeks.")
+        st.info("No documents indexed yet.")
     else:
         for item in indexed_sources:
             col1, col2 = st.columns([3, 1])
             with col1:
                 st.write(f"📄 **{item['source']}**")
-                st.caption(f"{item['chunks']} chunks • {item['page_count']} hal")
+                st.caption(f"{item['chunks']} chunks • {item['page_count']} page(s)")
             with col2:
-                if st.button("🗑️", key=f"del_{item['source']}", help="Hapus dokumen ini"):
+                if st.button("🗑️", key=f"del_{item['source']}", help="Delete this document"):
                     vector_store.delete_source(item["source"])
-                    st.toast(f"Dihapus: {item['source']}")
+                    st.toast(f"Deleted: {item['source']}")
                     st.rerun()
 
-        if st.button("🧹 Bersihkan Semua Data", use_container_width=True, type="secondary"):
+        if st.button("🧹 Clear All Data", use_container_width=True, type="secondary"):
             vector_store.clear_all()
             st.session_state.chat_history = []
-            st.success("Semua data vector store berhasil dihapus.")
+            st.success("All vector database records have been deleted.")
             st.rerun()
 
 # ==========================================
@@ -193,7 +193,7 @@ with st.sidebar:
 # ==========================================
 st.markdown('<div class="main-title">DocuMind</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="sub-title">Sistem Tanya-Jawab Dokumen berbasis Retrieval-Augmented Generation (RAG) dengan Sitasi Akurat</div>',
+    '<div class="sub-title">Local-First Document Q&A Knowledge Base powered by RAG & Google Gemini with Grounded Citations</div>',
     unsafe_allow_html=True,
 )
 
@@ -204,12 +204,12 @@ total_chunks = sum(s["chunks"] for s in indexed_sources)
 
 col_m1, col_m2, col_m3 = st.columns(3)
 with col_m1:
-    st.metric("Total Dokumen Aktif", f"{total_sources} file")
+    st.metric("Indexed Documents", f"{total_sources} file(s)")
 with col_m2:
-    st.metric("Total Chunks Vector", f"{total_chunks} chunk")
+    st.metric("Vector Chunks", f"{total_chunks} chunk(s)")
 with col_m3:
-    status_label = "🟢 Siap" if total_sources > 0 else "⚪ Menunggu Dokumen"
-    st.metric("Status Sistem", status_label)
+    status_label = "🟢 Ready" if total_sources > 0 else "⚪ Awaiting Documents"
+    st.metric("System Status", status_label)
 
 st.divider()
 
@@ -217,13 +217,13 @@ st.divider()
 if total_sources == 0:
     st.info(
         """
-        👋 **Selamat datang di DocuMind!**
+        👋 **Welcome to DocuMind!**
         
-        Untuk memulai eksplorasi knowledge base dokumen:
-        1. Masukkan **Gemini API Key** Anda di panel sebelah kiri.
-        2. Unggah dokumen (**PDF**, **Markdown**, atau **TXT**).
-        3. Klik tombol **"Proses & Indeks Dokumen"**.
-        4. Mulai ajukan pertanyaan di kotak chat di bawah!
+        To start querying your knowledge base:
+        1. Enter your **Gemini API Key** in the left sidebar.
+        2. Upload your documents (**PDF**, **Markdown**, or **TXT**).
+        3. Click **"Process & Index Documents"**.
+        4. Start asking questions in the chat box below!
         """
     )
 
@@ -232,17 +232,17 @@ for message in st.session_state.chat_history:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         if message.get("sources"):
-            with st.expander(f"📚 Referensi Sumber ({len(message['sources'])} kutipan)"):
+            with st.expander(f"📚 Source Citations ({len(message['sources'])} snippet(s))"):
                 for src in message["sources"]:
                     st.markdown(
                         f"""
-                        **📄 `{src['source']}`** — *Halaman {src['page']}* (Skor Kesesuaian: `{src['score'] * 100:.1f}%`)  
+                        **📄 `{src['source']}`** — *Page {src['page']}* (Relevance: `{src['score'] * 100:.1f}%`)  
                         > {src['text']}
                         """
                     )
 
 # Chat Input & Streaming Execution
-user_query = st.chat_input("Tanyakan sesuatu seputar dokumen yang telah diunggah...")
+user_query = st.chat_input("Ask anything about your uploaded documents...")
 
 if user_query:
     # Display User Message
@@ -258,11 +258,11 @@ if user_query:
         # Show Retrieved Citations
         retrieved_sources = rag_engine.last_retrieved_sources
         if retrieved_sources:
-            with st.expander(f"📚 Referensi Sumber ({len(retrieved_sources)} kutipan)"):
+            with st.expander(f"📚 Source Citations ({len(retrieved_sources)} snippet(s))"):
                 for src in retrieved_sources:
                     st.markdown(
                         f"""
-                        **📄 `{src['source']}`** — *Halaman {src['page']}* (Skor Kesesuaian: `{src['score'] * 100:.1f}%`)  
+                        **📄 `{src['source']}`** — *Page {src['page']}* (Relevance: `{src['score'] * 100:.1f}%`)  
                         > {src['text']}
                         """
                     )
